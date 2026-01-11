@@ -76,6 +76,7 @@ O CRM AI é uma aplicação SPA (Single Page Application) com backend serverless
 ## Stack Tecnológico
 
 ### Frontend
+
 - **React 18.3**: Biblioteca UI com hooks
 - **TypeScript 5.5**: Tipagem estática
 - **Vite 5.4**: Build tool e dev server ultra-rápido
@@ -83,6 +84,7 @@ O CRM AI é uma aplicação SPA (Single Page Application) com backend serverless
 - **Lucide React**: Biblioteca de ícones SVG
 
 ### Backend
+
 - **Supabase**: Platform BaaS (Backend as a Service)
   - PostgreSQL 15+ com extensões
   - Row Level Security (RLS)
@@ -94,6 +96,7 @@ O CRM AI é uma aplicação SPA (Single Page Application) com backend serverless
   - APIs Web modernas
 
 ### IA
+
 - **Anthropic Claude**: Modelo recomendado (Claude 3.5 Sonnet)
 - **OpenAI GPT-4**: Alternativa
 - **Google Gemini**: Alternativa
@@ -131,8 +134,8 @@ src/
 
 ```typescript
 // LeadCard.tsx
-import { useState } from 'react';
-import { Lead } from '../../types';
+import { useState } from "react";
+import { Lead } from "../../types";
 
 interface LeadCardProps {
   lead: Lead;
@@ -145,11 +148,7 @@ export function LeadCard({ lead, onUpdate, onDelete }: LeadCardProps) {
 
   // Lógica do componente
 
-  return (
-    <div className="bg-white rounded-lg shadow p-4">
-      {/* JSX */}
-    </div>
-  );
+  return <div className="bg-white rounded-lg shadow p-4">{/* JSX */}</div>;
 }
 ```
 
@@ -157,9 +156,9 @@ export function LeadCard({ lead, onUpdate, onDelete }: LeadCardProps) {
 
 ```typescript
 // useLeads.ts
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { Lead } from '../types';
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { Lead } from "../types";
 
 export function useLeads(workspaceId: string) {
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -173,10 +172,7 @@ export function useLeads(workspaceId: string) {
   async function fetchLeads() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('leads')
-        .select('*')
-        .eq('workspace_id', workspaceId);
+      const { data, error } = await supabase.from("leads").select("*").eq("workspace_id", workspaceId);
 
       if (error) throw error;
       setLeads(data || []);
@@ -194,14 +190,17 @@ export function useLeads(workspaceId: string) {
 ### Gerenciamento de Estado
 
 #### Estado Local
+
 - `useState`: Para estado de componente
 - `useReducer`: Para estado complexo (futuro)
 
 #### Estado Global
+
 - **Context API**: Autenticação (AuthContext)
 - **Supabase Realtime** (futuro): Sincronização em tempo real
 
 #### Estado de Servidor
+
 - **Supabase Queries**: Dados buscados sob demanda
 - **Cache manual**: Re-fetch após mutações
 
@@ -289,6 +288,7 @@ CREATE POLICY "Members can insert"
 Função serverless que integra com APIs de IA.
 
 **Input:**
+
 ```json
 {
   "campaignId": "uuid",
@@ -297,6 +297,7 @@ Função serverless que integra com APIs de IA.
 ```
 
 **Processamento:**
+
 1. Busca dados da campanha e lead
 2. Constrói prompt personalizado
 3. Chama API de IA configurada
@@ -305,6 +306,7 @@ Função serverless que integra com APIs de IA.
 6. Retorna resultado
 
 **Output:**
+
 ```json
 {
   "messages": [
@@ -316,28 +318,25 @@ Função serverless que integra com APIs de IA.
 ```
 
 **Estrutura:**
+
 ```typescript
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 serve(async (req) => {
   // 1. CORS
-  if (req.method === 'OPTIONS') return corsResponse();
+  if (req.method === "OPTIONS") return corsResponse();
 
   // 2. Auth check
-  const token = req.headers.get('Authorization')?.split('Bearer ')[1];
-  if (!token) return errorResponse('Unauthorized', 401);
+  const token = req.headers.get("Authorization")?.split("Bearer ")[1];
+  if (!token) return errorResponse("Unauthorized", 401);
 
   // 3. Parse input
   const { campaignId, leadId } = await req.json();
 
   // 4. Fetch data
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const { data: campaign } = await supabase
-    .from('campaigns')
-    .select('*')
-    .eq('id', campaignId)
-    .single();
+  const { data: campaign } = await supabase.from("campaigns").select("*").eq("id", campaignId).single();
 
   // 5. Call AI API
   const messages = await generateWithAI(campaign, lead);
@@ -355,6 +354,7 @@ serve(async (req) => {
 ### Entidades Principais
 
 #### Workspace
+
 ```typescript
 interface Workspace {
   id: string;
@@ -365,17 +365,19 @@ interface Workspace {
 ```
 
 #### Workspace Member
+
 ```typescript
 interface WorkspaceMember {
   id: string;
   workspace_id: string;
   user_id: string;
-  role: 'admin' | 'member' | 'viewer';
+  role: "admin" | "member" | "viewer";
   created_at: string;
 }
 ```
 
 #### Lead
+
 ```typescript
 interface Lead {
   id: string;
@@ -396,6 +398,7 @@ interface Lead {
 ```
 
 #### Pipeline Stage
+
 ```typescript
 interface PipelineStage {
   id: string;
@@ -410,6 +413,7 @@ interface PipelineStage {
 ```
 
 #### Campaign
+
 ```typescript
 interface Campaign {
   id: string;
@@ -425,6 +429,7 @@ interface Campaign {
 ```
 
 #### Generated Message
+
 ```typescript
 interface GeneratedMessage {
   id: string;
@@ -443,11 +448,13 @@ interface GeneratedMessage {
 ### Camadas de Segurança
 
 1. **Frontend**
+
    - Validação de inputs
    - Sanitização de dados
    - Verificação de sessão
 
 2. **API/Edge Functions**
+
    - Verificação de JWT
    - Validação de permissões
    - Rate limiting (futuro)
@@ -563,18 +570,21 @@ interface GeneratedMessage {
 ## Decisões de Design
 
 ### Por que React?
+
 - Ecosistema maduro
 - Performance com Virtual DOM
 - Hooks para lógica reutilizável
 - Grande comunidade
 
 ### Por que TypeScript?
+
 - Type safety reduz bugs
 - Melhor DX (autocomplete, refactoring)
 - Documentação implícita
 - Escalabilidade
 
 ### Por que Supabase?
+
 - Backend completo out-of-the-box
 - PostgreSQL (relacional, maduro)
 - RLS nativo para multi-tenancy
@@ -583,6 +593,7 @@ interface GeneratedMessage {
 - Free tier generoso
 
 ### Por que Tailwind?
+
 - Produtividade alta
 - Consistência de design
 - Sem conflitos de CSS
@@ -590,12 +601,14 @@ interface GeneratedMessage {
 - Responsividade fácil
 
 ### Por que não Redux?
+
 - Aplicação pequena/média
 - Context API suficiente
 - Supabase já gerencia estado de servidor
 - Menos boilerplate
 
 ### Por que Edge Functions?
+
 - Serverless (sem servidor para gerenciar)
 - Escala automático
 - Deno runtime moderno
@@ -603,6 +616,7 @@ interface GeneratedMessage {
 - Free tier
 
 ### Multi-tenancy via RLS
+
 - Isolamento garantido no banco
 - Performance melhor que queries filtradas
 - Segurança em múltiplas camadas
@@ -611,24 +625,28 @@ interface GeneratedMessage {
 ## Melhorias Futuras
 
 ### Performance
+
 - React Query para cache inteligente
 - Lazy loading de componentes
 - Virtual scrolling em listas grandes
 - Otimização de imagens
 
 ### Escalabilidade
+
 - Supabase Realtime para updates
 - WebSockets para notificações
 - Cache com Redis (se necessário)
 - CDN para assets estáticos
 
 ### Monitoramento
+
 - Sentry para error tracking
 - Analytics (Plausible/Umami)
 - Logs estruturados
 - Métricas de performance
 
 ### Testes
+
 - Jest + React Testing Library
 - Playwright para E2E
 - CI/CD automatizado
